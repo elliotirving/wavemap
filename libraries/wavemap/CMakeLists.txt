@@ -3,7 +3,9 @@ project(wavemap)
 
 # Dependencies
 find_package(catkin
-    REQUIRED COMPONENTS glog_catkin eigen_catkin tracy_catkin minkindr)
+    REQUIRED COMPONENTS glog_catkin tracy_catkin minkindr)
+
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 if (ENABLE_BENCHMARKING)
   find_package(benchmark REQUIRED)
@@ -22,7 +24,6 @@ catkin_package(
     ${PROJECT_NAME}
     CATKIN_DEPENDS
     glog_catkin
-    eigen_catkin
     tracy_catkin
     minkindr
     CFG_EXTRAS
@@ -68,7 +69,7 @@ add_library(${PROJECT_NAME}
     src/integrator/integrator_factory.cc
     src/utils/stopwatch.cc
     src/utils/thread_pool.cc)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Eigen3::Eigen)
 
 # Install targets
 install(TARGETS ${PROJECT_NAME}

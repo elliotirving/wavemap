@@ -13,7 +13,6 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>glog_catkin</depend>
-  <depend>eigen_catkin</depend>
   <depend>tracy_catkin</depend>
   <depend>minkindr</depend>
 

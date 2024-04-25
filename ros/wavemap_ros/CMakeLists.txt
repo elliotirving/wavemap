@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
+cmake_policy(SET CMP0057 NEW) # added to remove warning about policy CMP0057
 project(wavemap_ros)
 
 find_package(catkin_simple REQUIRED)
@@ -6,13 +7,14 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 # Find OpenCV explicitly to avoid issues on Jetson
 find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
-# Optional dependencies
-find_package(livox_ros_driver2 QUIET)
-if (livox_ros_driver2_FOUND)
-  include_directories(${livox_ros_driver2_INCLUDE_DIRS})
-  add_compile_definitions(LIVOX_AVAILABLE)
-endif ()
+# # Optional dependencies
+# find_package(livox_ros_driver2 QUIET)
+# if (livox_ros_driver2_FOUND)
+#   include_directories(${livox_ros_driver2_INCLUDE_DIRS})
+#   add_compile_definitions(LIVOX_AVAILABLE)
+# endif ()
 
 # Compiler definitions and options
 add_wavemap_compile_definitions_and_options()
@@ -28,7 +30,7 @@ cs_add_library(${PROJECT_NAME}
     src/input_handler/pointcloud_undistorter.cc
     src/wavemap_server.cc)
 # Link OpenCV explicitly to avoid issues on Jetson
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES} Eigen3::Eigen)
 
 # Binaries
 cs_add_executable(wavemap_server_node app/server_node.cc)

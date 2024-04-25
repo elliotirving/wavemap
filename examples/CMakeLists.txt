@@ -4,12 +4,15 @@ project(wavemap_examples)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
+find_package(Eigen3 REQUIRED NO_MODULE)
+
 # Compiler definitions and options
 add_wavemap_compile_definitions_and_options()
 add_compile_options(-Wno-suggest-attribute=const)
 
 # For all targets
 include_directories(include)
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Binaries
 cs_add_executable(save_map_to_file

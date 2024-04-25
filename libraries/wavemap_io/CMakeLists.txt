@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(wavemap_io)
 
 find_package(catkin_simple REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 catkin_simple(ALL_DEPS_REQUIRED)
 # TODO(victorr): Switch to regular catkin
 
@@ -13,7 +14,7 @@ add_wavemap_compile_definitions_and_options()
 cs_add_library(${PROJECT_NAME}
     src/file_conversions.cc
     src/stream_conversions.cc)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Eigen3::Eigen)
 
 # Tests
 if (CATKIN_ENABLE_TESTING)
