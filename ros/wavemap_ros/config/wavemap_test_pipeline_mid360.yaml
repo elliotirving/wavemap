@@ -16,7 +16,7 @@ inputs:
   - type: pointcloud
     general:
       topic_name: "/livox/lidar_sensor_msgs" # changed input, converted to points pre-Wavemap
-      topic_type: PointCloud2 # changed
+      topic_type: PointCloud2 # changed from livox
       undistort_motion: false
       reprojected_pointcloud_topic_name: "/wavemap/input"
       topic_queue_length: 10
