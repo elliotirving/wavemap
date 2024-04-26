@@ -37,18 +37,24 @@ Input to Wavemap is ros1_bridged mid360 point cloud and IMU topics. -->
         output="screen"/> -->
 
   <!-- Link TF frames -->
+  <!-- old style tf frame order: parent then child -->
   <node pkg="tf"
         type="static_transform_publisher"
         name="link_odom_camera_init"
         args="0.0 0.0 0.0 0.0 0.0 0.0 1.000
-            odom camera_init 100"/>
-  <!-- HARDCODING EXTRINSICS -->
+            body livox_frame 100"/> 
   <node pkg="tf"
         type="static_transform_publisher"
         name="link_body_livox_frame"
+        args="-0.0110 -0.02329 0.04412 0.0 0.0 0.0 1.000
+            camera_init body 100"/>
+  <!-- <node pkg="tf"
+        type="static_transform_publisher"
+        name="link_body_livox_frame"
         args="0.003034 -0.105752 -0.024020 0.0154225 -0.0118158 -0.0334473 0.9992516
-            imu_forward_prop livox_frame 100"/>
+            imu_forward_prop livox_frame 100"/> -->
   <!-- Not sure if I need to add other tf nodes?? -->
+
 
   <!-- Run wavemap -->
   <include file="$(find wavemap_ros)/launch/wavemap_server.launch"

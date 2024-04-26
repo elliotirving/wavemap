@@ -2,7 +2,7 @@
 
 map:
   general:
-    world_frame: "odom"
+    world_frame: "camera_init"
     thresholding_period: { seconds: 2.0 }
     pruning_period: { seconds: 10.0 }
     publication_period: { seconds: 3.0 }
@@ -15,9 +15,9 @@ map:
 inputs:
   - type: pointcloud
     general:
-      topic_name: "/livox/lidar_sensor_msgs" # changed input, converted to points pre-Wavemap
+      topic_name: "/livox/lidar_sensor_msgs" # changed input, converted pre-Wavemap
       topic_type: PointCloud2 # changed
-      undistort_motion: false
+      undistort_motion: false # changed
       reprojected_pointcloud_topic_name: "/wavemap/input"
       topic_queue_length: 10
       max_wait_for_pose: { seconds: 1.0 }
