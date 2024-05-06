@@ -6,7 +6,7 @@ Input to Wavemap is ros1_bridged mid360 point cloud and IMU topics. -->
        default="$(find wavemap_ros)/config/wavemap_test_pipeline_mid360.yaml"
        doc="Name of the file from which to read wavemap's server params."/>
   <arg name="rviz_config"
-       default="$(find wavemap_ros)/config/rviz/live_demo.rviz"/>
+       default="$(find wavemap_ros)/config/rviz/test_pipeline.rviz"/> <!-- live_demo.rviz not working? -->
 
   <!-- Run the Livox driver -->
   <!-- <arg name="bd_list" default="100000000000000"/>
@@ -43,11 +43,11 @@ Input to Wavemap is ros1_bridged mid360 point cloud and IMU topics. -->
         name="link_odom_camera_init"
         args="0.0 0.0 0.0 0.0 0.0 0.0 1.000
             body livox_frame 100"/> 
-  <node pkg="tf"
+  <!-- <node pkg="tf"
         type="static_transform_publisher"
         name="link_body_livox_frame"
         args="-0.0110 -0.02329 0.04412 0.0 0.0 0.0 1.000
-            camera_init body 100"/>
+            camera_init body 100"/> -->
   <!-- <node pkg="tf"
         type="static_transform_publisher"
         name="link_body_livox_frame"

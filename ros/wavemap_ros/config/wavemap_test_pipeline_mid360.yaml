@@ -5,7 +5,7 @@ map:
     world_frame: "camera_init"
     thresholding_period: { seconds: 2.0 }
     pruning_period: { seconds: 10.0 }
-    publication_period: { seconds: 3.0 }
+    publication_period: { seconds: 1.0 }
     logging_level: debug
     allow_reset_map_service: true
   data_structure:
@@ -20,7 +20,7 @@ inputs:
       undistort_motion: false # changed
       reprojected_pointcloud_topic_name: "/wavemap/input"
       topic_queue_length: 10
-      max_wait_for_pose: { seconds: 1.0 }
+      max_wait_for_pose: { seconds: 5.0 }
     integrators:
       - integration_method:
           type: hashed_chunked_wavelet_integrator

@@ -61,7 +61,7 @@ void PointcloudInputHandler::callback(
     return;
   }
 
-  ROS_INFO_STREAM("Calling back for " << num_points << " new lidar points."); // debug
+  ROS_INFO_STREAM("Callback for " << num_points << " new lidar points."); // debug
 
   // Get the index of the x field, and assert that the y and z fields follow
   auto x_field_iter = std::find_if(
@@ -118,7 +118,6 @@ void PointcloudInputHandler::callback(
 
   // If undistortion is disabled or loading failed, only load positions
   if (!loaded) {
-    ROS_INFO_STREAM("Loading point positions to stamped_pointcloud"); // debug
     for (; pos_it != pos_it.end(); ++pos_it) {
       stamped_pointcloud.emplace(pos_it[0], pos_it[1], pos_it[2], 0); // sets time offset to 0
     }
@@ -219,6 +218,10 @@ void PointcloudInputHandler::processQueue() {
               world_frame_, oldest_msg.getSensorFrame(),
               convert::nanoSecondsToRosTime(oldest_msg.getTimeBase()), T_W_C)) {
         // Try to get this pointcloud's pose again at the next iteration
+
+        // Note: if lookupTransform() is failing, check: 
+          // using --clock and --use_sim_time = true if running on a bag file
+          // That FAST-LIO publishes TF's with time stamps
         ROS_INFO_STREAM("lookupTransform failed."); // debug
         ROS_INFO_STREAM("to world_frame_: " << world_frame_); // debug
         ROS_INFO_STREAM("from sensor_frame_: " << oldest_msg.getSensorFrame()); // debug
