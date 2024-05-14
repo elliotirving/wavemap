@@ -16,6 +16,9 @@ void CoarseToFineIntegrator::updateMap() {
   for (const OctreeIndex& node_index : occupancy_map_->getFirstChildIndices()) {
     stack.emplace(node_index);
   }
+
+  int num_points_integrated = 0; // Insertion testing
+
   while (!stack.empty()) {
     auto current_node = std::move(stack.top());
     stack.pop();
@@ -29,6 +32,7 @@ void CoarseToFineIntegrator::updateMap() {
       const FloatingPoint sample = computeUpdate(C_node_center);
       if (kEpsilon < std::abs(sample)) {
         occupancy_map_->addToCellValue(current_node, sample);
+        num_points_integrated++; // Insertion testing
       }
       continue;
     }
@@ -66,6 +70,7 @@ void CoarseToFineIntegrator::updateMap() {
       const FloatingPoint sample = computeUpdate(C_node_center);
       if (kEpsilon < std::abs(sample)) {
         occupancy_map_->addToCellValue(current_node, sample);
+        num_points_integrated++; // Insertion testing
       }
       continue;
     }
@@ -76,5 +81,8 @@ void CoarseToFineIntegrator::updateMap() {
       stack.emplace(current_node.computeChildIndex(relative_child_idx));
     }
   }
+
+  ROS_INFO_STREAM("Integrated " << num_points_integrated << " points into the map."); // Insertion testing
+
 }
 }  // namespace wavemap

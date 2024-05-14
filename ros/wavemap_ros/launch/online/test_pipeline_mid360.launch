@@ -1,5 +1,7 @@
 <!-- Launch file is for testing the ROS2 FASTLIO2 odometry into Wavemap pipeline.
+Mid360 DATASET running with clock argument. NO OTHER SENSORS.
 Input to Wavemap is ros1_bridged mid360 point cloud and IMU topics. -->
+
 <launch>
   <!-- Wavemap params -->
   <arg name="param_file"

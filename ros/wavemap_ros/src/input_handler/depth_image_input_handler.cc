@@ -76,6 +76,13 @@ void DepthImageInputHandler::processQueue() {
       if ((newest_msg.header.stamp - oldest_msg.header.stamp).toSec() <
           config_.max_wait_for_pose) {
         // Try to get this depth image's pose again at the next iteration
+
+        ROS_INFO_STREAM("Depth img handler."); // debug
+        ROS_INFO_STREAM("lookupTransform failed."); // debug
+        ROS_INFO_STREAM("to world_frame_: " << world_frame_); // debug
+        ROS_INFO_STREAM("from sensor_frame_: " << sensor_frame_id); // debug
+        ROS_INFO_STREAM("stamp: " << stamp); // debug
+
         return;
       } else {
         ROS_WARN_STREAM("Waited " << config_.max_wait_for_pose
@@ -88,6 +95,8 @@ void DepthImageInputHandler::processQueue() {
         continue;
       }
     }
+
+    ROS_INFO_STREAM("lookupTransform success."); // debug
 
     // Convert the depth image to our coordinate convention
     auto cv_image = cv_bridge::toCvCopy(oldest_msg);

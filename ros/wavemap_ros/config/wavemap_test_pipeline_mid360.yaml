@@ -1,4 +1,5 @@
-# built for Mid-360 dataset (no other sensors). Testing the ROS2 FASTLIO -> bridge -> Wavemap pipeline
+# built for Mid-360 DATASET (no other sensors). Testing the ROS2 FASTLIO -> bridge -> Wavemap pipeline
+#  Can confirm it's working
 
 map:
   general:

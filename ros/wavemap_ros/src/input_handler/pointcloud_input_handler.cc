@@ -222,6 +222,7 @@ void PointcloudInputHandler::processQueue() {
         // Note: if lookupTransform() is failing, check: 
           // using --clock and --use_sim_time = true if running on a bag file
           // That FAST-LIO publishes TF's with time stamps
+        ROS_INFO_STREAM("Pointcloud handler."); // debug
         ROS_INFO_STREAM("lookupTransform failed."); // debug
         ROS_INFO_STREAM("to world_frame_: " << world_frame_); // debug
         ROS_INFO_STREAM("from sensor_frame_: " << oldest_msg.getSensorFrame()); // debug

@@ -1,0 +1,43 @@
+<!-- Launch for running the FULL ROS2 FASTLIO2 odometry to Wavemap pipeline.
+LIVE operation.
+Input to Wavemap is ros1_bridged odometry and sensor point clouds (mid360 and realsense). -->
+
+<launch>
+  <!-- Wavemap params -->
+  <arg name="param_file"
+       default="$(find wavemap_ros)/config/wavemap_test_pipeline_full.yaml"
+       doc="Name of the file from which to read wavemap's server params."/>
+  <arg name="rviz_config"
+       default="$(find wavemap_ros)/config/rviz/test_pipeline.rviz"/> <!-- live_demo.rviz not working? -->
+
+  <!-- Run the Livox driver -->
+  <!-- Assumes livox_ros_dirver2 is already running in ROS2,  -->
+
+  <!-- Run odometry -->
+  <!-- Assumes FASTLIO2 (ROS2) is running and odometry is bridged. -->
+
+  <!-- Link TF frames -->
+  <!-- Assumes TFs are already linked/published by the sensor_tf_broadcaster node and FASTLIO2 -->
+
+  <!-- old style tf frame order: parent then child -->
+  <!-- <node pkg="tf"
+        type="static_transform_publisher"
+        name="link_odom_camera_init"
+        args="0.0 0.0 0.0 0.0 0.0 0.0 1.000
+            body livox_frame 100"/>  -->
+  <!-- <node pkg="tf"
+        type="static_transform_publisher"
+        name="link_body_livox_frame"
+        args="-0.0110 -0.02329 0.04412 0.0 0.0 0.0 1.000
+            camera_init body 100"/> -->
+  <!-- <node pkg="tf"
+        type="static_transform_publisher"
+        name="link_body_livox_frame"
+        args="0.003034 -0.105752 -0.024020 0.0154225 -0.0118158 -0.0334473 0.9992516
+            imu_forward_prop livox_frame 100"/> -->
+
+
+  <!-- Run wavemap -->
+  <include file="$(find wavemap_ros)/launch/wavemap_server.launch"
+           pass_all_args="true"/>
+</launch>

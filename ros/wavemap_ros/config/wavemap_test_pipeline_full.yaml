@@ -1,0 +1,101 @@
+# Testing the full ROS2 FASTLIO -> bridge -> Wavemap pipeline, both mid360 and depth sensors
+
+
+
+map:
+  general:
+    world_frame: "camera_init" # map frame from FASTLIO2
+    thresholding_period: { seconds: 2.0 }
+    pruning_period: { seconds: 10.0 }
+    publication_period: { seconds: 1.0 }
+    logging_level: debug
+    allow_reset_map_service: true
+  data_structure:
+    type: hashed_chunked_wavelet_octree
+    min_cell_width: { meters: 0.01 }
+    # tree_height: 9 #WHAT IS THIS FOR???
+
+inputs:
+  # - type: pointcloud
+  #   general:
+  #     topic_name: "/livox/lidar_sensor_msgs" # ros1_bridge NOT bridging Livox CustomMsg
+  #     topic_type: PointCloud2 # normally livox, see ^^^
+  #     undistort_motion: false # Can't undistort for now, may implement in livox_to_pointcloud2
+  #     reprojected_pointcloud_topic_name: "/wavemap/lidar_input"
+  #     topic_queue_length: 10
+  #     max_wait_for_pose: { seconds: 5.0 }
+  #   integrators:
+  #     - integration_method:
+  #         type: hashed_chunked_wavelet_integrator
+  #         min_range: { meters: 0.5 }
+  #         max_range: { meters: 12.0 }
+  #         termination_update_error: 0.1
+  #       projection_model:
+  #         type: spherical_projector
+  #         elevation:
+  #           num_cells: 32
+  #           min_angle: { degrees: -7.0 }
+  #           max_angle: { degrees: 52.0 }
+  #         azimuth:
+  #           num_cells: 512
+  #           min_angle: { degrees: -180.0 }
+  #           max_angle: { degrees: 180.0 }
+  #       measurement_model:
+  #         type: continuous_beam
+  #         angle_sigma: { degrees: 0.05 }
+  #         # NOTE: For best results, we recommend setting range_sigma to
+  #         #       max(min_cell_width / 2, ouster_noise) where ouster_noise = 0.05
+  #         range_sigma: { meters: 0.08 }
+  #         scaling_free: 0.2
+  #         scaling_occupied: 0.4
+
+######################### TESTING POINTCLOUD (DEPTH) INTEGRATOR TYPE #########################
+# HAVENT TESTED THIS YET, SO FAR ONLY WORKING WITH DEPTH INTEGRATOR
+  - type: pointcloud
+    general:
+      topic_name: "/d435f_1/d435f_1/depth/color/points"
+      topic_type: PointCloud2
+      undistort_motion: true
+      topic_queue_length: 10
+      max_wait_for_pose: { seconds: 1.0 }
+      # reprojected_pointcloud_topic_name: "/wavemap/reprojected_pointcloud"
+      # projected_range_image_topic_name: "/wavemap/projected_range_image"
+    integrators:
+      - integration_method:
+          type: hashed_chunked_wavelet_integrator
+          min_range: { meters: 0.2 }
+          max_range: { meters: 1.0 }
+          termination_update_error: 0.1
+          termination_height: 0
+        projection_model:
+          type: pinhole_camera_projector
+          width: 848
+          height: 480
+          fx: 427.29736328125
+          fy: 427.29736328125
+          cx: 432.1024475097656
+          cy: 236.54649353027344
+        measurement_model:
+          type: continuous_ray
+          range_sigma: { meters: 0.005 }
+          scaling_free: 0.4
+          scaling_occupied: 0.8
+      - integration_method:
+          type: hashed_chunked_wavelet_integrator
+          min_range: { meters: 1.0 }
+          max_range: { meters: 3.0 }
+          termination_update_error: 0.1
+          termination_height: 1
+        projection_model:
+          type: pinhole_camera_projector
+          width: 848
+          height: 480
+          fx: 427.29736328125
+          fy: 427.29736328125
+          cx: 432.1024475097656
+          cy: 236.54649353027344
+        measurement_model:
+          type: continuous_ray
+          range_sigma: { meters: 0.005 }
+          scaling_free: 0.4
+          scaling_occupied: 0.8
