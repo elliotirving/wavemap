@@ -3,7 +3,7 @@ project(wavemap)
 
 # Dependencies
 find_package(catkin
-    REQUIRED COMPONENTS glog_catkin tracy_catkin minkindr)
+    REQUIRED COMPONENTS glog_catkin tracy_catkin minkindr roscpp)
 
 find_package(Eigen3 REQUIRED NO_MODULE)
 

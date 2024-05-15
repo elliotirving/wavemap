@@ -17,39 +17,39 @@ map:
     # tree_height: 9 #WHAT IS THIS FOR???
 
 inputs:
-  # - type: pointcloud
-  #   general:
-  #     topic_name: "/livox/lidar_sensor_msgs" # ros1_bridge NOT bridging Livox CustomMsg
-  #     topic_type: PointCloud2 # normally livox, see ^^^
-  #     undistort_motion: false # Can't undistort for now, may implement in livox_to_pointcloud2
-  #     # reprojected_pointcloud_topic_name: "/wavemap/lidar_input"
-  #     topic_queue_length: 10
-  #     max_wait_for_pose: { seconds: 1.0 }
-  #   integrators:
-  #     - integration_method:
-  #         type: hashed_chunked_wavelet_integrator
-  #         min_range: { meters: 0.5 }
-  #         max_range: { meters: 12.0 }
-  #         termination_update_error: 0.1
-  #         termination_height: 0 # Defaults to 0 (max res)
-  #       projection_model:
-  #         type: spherical_projector
-  #         elevation:
-  #           num_cells: 32
-  #           min_angle: { degrees: -7.0 }
-  #           max_angle: { degrees: 52.0 }
-  #         azimuth:
-  #           num_cells: 512
-  #           min_angle: { degrees: -180.0 }
-  #           max_angle: { degrees: 180.0 }
-  #       measurement_model:
-  #         type: continuous_beam
-  #         angle_sigma: { degrees: 0.05 }
-  #         # NOTE: For best results, we recommend setting range_sigma to
-  #         #       max(min_cell_width / 2, ouster_noise) where ouster_noise = 0.05
-  #         range_sigma: { meters: 0.08 }
-  #         scaling_free: 0.2
-  #         scaling_occupied: 0.4
+  - type: pointcloud
+    general:
+      topic_name: "/livox/lidar_sensor_msgs" # ros1_bridge NOT bridging Livox CustomMsg
+      topic_type: PointCloud2 # normally livox, see ^^^
+      undistort_motion: false # Can't undistort for now, may implement in livox_to_pointcloud2
+      # reprojected_pointcloud_topic_name: "/wavemap/lidar_input"
+      topic_queue_length: 10 # probably need to increase this a lot?
+      max_wait_for_pose: { seconds: 1.0 } # was 1, allowing more time
+    integrators:
+      - integration_method:
+          type: hashed_chunked_wavelet_integrator
+          min_range: { meters: 0.5 }
+          max_range: { meters: 12.0 }
+          termination_update_error: 0.1
+          termination_height: 0 # Defaults to 0 (max res)
+        projection_model:
+          type: spherical_projector
+          elevation:
+            num_cells: 32
+            min_angle: { degrees: -7.0 }
+            max_angle: { degrees: 52.0 }
+          azimuth:
+            num_cells: 512
+            min_angle: { degrees: -180.0 }
+            max_angle: { degrees: 180.0 }
+        measurement_model:
+          type: continuous_beam
+          angle_sigma: { degrees: 0.05 }
+          # NOTE: For best results, we recommend setting range_sigma to
+          #       max(min_cell_width / 2, ouster_noise) where ouster_noise = 0.05
+          range_sigma: { meters: 0.08 } # 0.08 default
+          scaling_free: 0.2
+          scaling_occupied: 0.4
 
 
   # - type: pointcloud
@@ -83,43 +83,15 @@ inputs:
   #         scaling_occupied: 0.8
 
 ######################### TESTING DEPTH_IMAGE INTEGRATOR TYPE #########################
-  - type: depth_image
-    general:
-      topic_name: "/d435f_1/d435f_1/depth/image_rect_raw" # WORKS
-      # topic_name: "/d435f_1/d435f_1/aligned_depth_to_color/image_raw" # DOES NOT WORK
-      topic_queue_length: 20
-      max_wait_for_pose: { seconds: 1.0 }
-      time_offset: { seconds: -0.01} # Unsure of value for D435f, imu to cam is +0.013387
-      depth_scale_factor: 0.01
-      # reprojected_pointcloud_topic_name: "/wavemap/depth_cam_input"
-    integrators:
-      - integration_method:
-          type: hashed_chunked_wavelet_integrator
-          min_range: { meters: 0.2 }
-          max_range: { meters: 1.0 }
-          termination_update_error: 0.1
-          # termination_height: 0
-        projection_model:
-          type: pinhole_camera_projector
-          width: 848
-          height: 480
-          fx: 427.29736328125
-          fy: 427.29736328125
-          cx: 432.1024475097656
-          cy: 236.54649353027344
-        measurement_model:
-          type: continuous_ray
-          range_sigma: { meters: 0.005 }
-          scaling_free: 0.4
-          scaling_occupied: 0.8
-
+# THIS ONE WORKS!!!!! FINE TUNE
   # - type: depth_image
   #   general:
-  #     topic_name: "/d435f_2/d435f_2/depth/image_rect_raw"
-  #     topic_queue_length: 1
+  #     topic_name: "/d435f_1/d435f_1/depth/image_rect_raw" # WORKS
+  #     # topic_name: "/d435f_1/d435f_1/aligned_depth_to_color/image_raw" # DOES NOT WORK
+  #     topic_queue_length: 30
   #     max_wait_for_pose: { seconds: 2.0 }
-  #     time_offset: { seconds: 0.00201747 } # Unsure of value for D435f
-  #     # depth_scale_factor: 0.001
+  #     time_offset: { seconds: -0.01} # Unsure of value for D435f, imu to cam is +0.013387
+  #     depth_scale_factor: 0.001 # D435 depth scale is 1mm, don't change
   #     # reprojected_pointcloud_topic_name: "/wavemap/depth_cam_input"
   #   integrators:
   #     - integration_method:
@@ -127,7 +99,7 @@ inputs:
   #         min_range: { meters: 0.2 }
   #         max_range: { meters: 1.0 }
   #         termination_update_error: 0.1
-  #         termination_height: 0
+  #         # termination_height: 0
   #       projection_model:
   #         type: pinhole_camera_projector
   #         width: 848
@@ -139,24 +111,25 @@ inputs:
   #       measurement_model:
   #         type: continuous_ray
   #         range_sigma: { meters: 0.005 }
-  #         scaling_free: 0.4
+  #         scaling_frsee: 0.4
   #         scaling_occupied: 0.8
-  #     - integration_method:
-  #         type: hashed_chunked_wavelet_integrator
-  #         min_range: { meters: 1.0 }
-  #         max_range: { meters: 3.0 }
-  #         termination_update_error: 0.1
-  #         termination_height: 1
-  #       projection_model:
-  #         type: pinhole_camera_projector
-  #         width: 848
-  #         height: 480
-  #         fx: 427.29736328125
-  #         fy: 427.29736328125
-  #         cx: 432.1024475097656
-  #         cy: 236.54649353027344
-  #       measurement_model:
-  #         type: continuous_ray
-  #         range_sigma: { meters: 0.01 }
-  #         scaling_free: 0.4
-  #         scaling_occupied: 0.8
+  # # add anothter later
+  # #     - integration_method:
+  # #         type: hashed_chunked_wavelet_integrator
+  # #         min_range: { meters: 1.0 }
+  # #         max_range: { meters: 3.0 }
+  # #         termination_update_error: 0.1
+  # #         termination_height: 1
+  # #       projection_model:
+  # #         type: pinhole_camera_projector
+  # #         width: 848
+  # #         height: 480
+  # #         fx: 427.29736328125
+  # #         fy: 427.29736328125
+  # #         cx: 432.1024475097656
+  # #         cy: 236.54649353027344
+  # #       measurement_model:
+  # #         type: continuous_ray
+  # #         range_sigma: { meters: 0.01 }
+  # #         scaling_free: 0.4
+  # #         scaling_occupied: 0.8

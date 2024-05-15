@@ -77,8 +77,7 @@ void DepthImageInputHandler::processQueue() {
           config_.max_wait_for_pose) {
         // Try to get this depth image's pose again at the next iteration
 
-        ROS_INFO_STREAM("Depth img handler."); // debug
-        ROS_INFO_STREAM("lookupTransform failed."); // debug
+        ROS_INFO_STREAM("Depth img handler lookupTransform failed."); // debug
         ROS_INFO_STREAM("to world_frame_: " << world_frame_); // debug
         ROS_INFO_STREAM("from sensor_frame_: " << sensor_frame_id); // debug
         ROS_INFO_STREAM("stamp: " << stamp); // debug
@@ -119,13 +118,22 @@ void DepthImageInputHandler::processQueue() {
                      << depth_image_queue_.size() - 1 << ".");
     integration_timer_.start();
     for (const auto& integrator : scanwise_integrators_) {
+      ROS_INFO_STREAM("DEPTH"); // Flags next integrated points call in updatemap() as depth handler
       integrator->integrateRangeImage(posed_range_image);
     }
     integration_timer_.stop();
+    
+    int depth_image_points = posed_range_image.size();
+    double depth_integration_time = integration_timer_.getLastEpisodeDuration();
+    double total_integration_time = integration_timer_.getTotalDuration(); 
+
+    // Insertion time testing
+    ROS_INFO_STREAM("Depth image points: " << depth_image_points << ", Depth integration time: " << depth_integration_time);
+    
     ROS_DEBUG_STREAM("Integrated new depth image in "
-                     << integration_timer_.getLastEpisodeDuration()
+                     << depth_integration_time
                      << "s. Total integration time: "
-                     << integration_timer_.getTotalDuration() << "s.");
+                     << total_integration_time << "s.");
 
     // Publish debugging visualizations
     if (shouldPublishReprojectedPointcloud()) {

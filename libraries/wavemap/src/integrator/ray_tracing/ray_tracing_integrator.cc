@@ -1,4 +1,5 @@
 #include "wavemap/integrator/ray_tracing/ray_tracing_integrator.h"
+#include <ros/ros.h>
 
 namespace wavemap {
 DECLARE_CONFIG_MEMBERS(RayTracingIntegratorConfig,
@@ -20,6 +21,8 @@ void RayTracingIntegrator::integratePointcloud(
   if (!isPointcloudValid(pointcloud)) {
     return;
   }
+
+  ROS_INFO_STREAM("RayTracingIntegrator::integratePointcloud called");
 
   const FloatingPoint min_cell_width = occupancy_map_->getMinCellWidth();
   const Point3D& W_start_point = pointcloud.getOrigin();

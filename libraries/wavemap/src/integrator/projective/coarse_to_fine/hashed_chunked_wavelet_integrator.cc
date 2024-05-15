@@ -1,6 +1,7 @@
 #include "wavemap/integrator/projective/coarse_to_fine/hashed_chunked_wavelet_integrator.h"
 
 #include <stack>
+#include <ros/ros.h>
 
 #include <tracy/Tracy.hpp>
 
@@ -33,14 +34,19 @@ void HashedChunkedWaveletIntegrator::updateMap() {
     occupancy_map_->getOrAllocateBlock(block_index);
   }
 
+  // Integration time testing
+  std::atomic<int> num_points_integrated(0);
+
   // Update it with the threadpool
   for (const auto& block_index : blocks_to_update) {
-    thread_pool_->add_task([this, block_index]() {
+    thread_pool_->add_task([this, &num_points_integrated, block_index]() { // // Integration time testing, added &num_points_integrated here
       auto& block = occupancy_map_->getBlock(block_index);
-      updateBlock(block, block_index);
+      updateBlock(block, block_index, num_points_integrated); // // Integration time testing, added num_points_integrated here
     });
   }
   thread_pool_->wait_all();
+
+  ROS_INFO_STREAM("Points integrated: " << num_points_integrated); // integration time testing
 }
 
 std::pair<OctreeIndex, OctreeIndex>
@@ -66,7 +72,8 @@ HashedChunkedWaveletIntegrator::getFovMinMaxIndices(
 
 void HashedChunkedWaveletIntegrator::updateBlock(
     HashedChunkedWaveletOctree::Block& block,
-    const HashedChunkedWaveletOctree::BlockIndex& block_index) {
+    const HashedChunkedWaveletOctree::BlockIndex& block_index,
+    std::atomic<int>& num_points_integrated) { // integration time testing
   ZoneScoped;
   block.setNeedsPruning();
   block.setLastUpdatedStamp();
@@ -76,7 +83,8 @@ void HashedChunkedWaveletIntegrator::updateBlock(
   updateNodeRecursive(block.getRootChunk(), root_node_index, 0u,
                       block.getRootScale(),
                       block.getRootChunk().nodeHasAtLeastOneChild(0u),
-                      block_needs_thresholding);
+                      block_needs_thresholding,
+                      num_points_integrated); // integration time testing
   block.setNeedsThresholding(block_needs_thresholding);
 }
 
@@ -85,7 +93,8 @@ void HashedChunkedWaveletIntegrator::updateNodeRecursive(  // NOLINT
     const OctreeIndex& parent_node_index, LinearIndex parent_in_chunk_index,
     FloatingPoint& parent_value,
     HashedChunkedWaveletOctreeBlock::NodeChunkType::BitRef parent_has_child,
-    bool& block_needs_thresholding) {
+    bool& block_needs_thresholding,
+    std::atomic<int>& num_points_integrated) { // integration time testing
   auto& parent_details = parent_chunk.nodeData(parent_in_chunk_index);
   auto child_values = HashedChunkedWaveletOctreeBlock::Transform::backward(
       {parent_value, parent_details});
@@ -136,6 +145,9 @@ void HashedChunkedWaveletIntegrator::updateNodeRecursive(  // NOLINT
       const FloatingPoint sample = computeUpdate(C_child_center);
       child_value += sample;
       block_needs_thresholding = true;
+
+      num_points_integrated++; // integration time testing
+
       continue;
     }
 
@@ -175,7 +187,8 @@ void HashedChunkedWaveletIntegrator::updateNodeRecursive(  // NOLINT
       DCHECK_GE(child_height, 0);
       updateNodeRecursive(*chunk_containing_child, child_index,
                           child_node_in_chunk_index, child_value,
-                          child_has_children, block_needs_thresholding);
+                          child_has_children, block_needs_thresholding,
+                          num_points_integrated); // integration time testing
     }
 
     if (child_has_children || data::is_nonzero(child_details)) {

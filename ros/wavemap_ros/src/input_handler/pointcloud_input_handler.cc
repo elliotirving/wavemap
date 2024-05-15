@@ -222,8 +222,7 @@ void PointcloudInputHandler::processQueue() {
         // Note: if lookupTransform() is failing, check: 
           // using --clock and --use_sim_time = true if running on a bag file
           // That FAST-LIO publishes TF's with time stamps
-        ROS_INFO_STREAM("Pointcloud handler."); // debug
-        ROS_INFO_STREAM("lookupTransform failed."); // debug
+        ROS_INFO_STREAM("Pointcloud handler lookupTransform failed."); // debug
         ROS_INFO_STREAM("to world_frame_: " << world_frame_); // debug
         ROS_INFO_STREAM("from sensor_frame_: " << oldest_msg.getSensorFrame()); // debug
         ROS_INFO_STREAM("oldest_msg.getTimeBase(): " << oldest_msg.getTimeBase()); // debug
@@ -247,13 +246,21 @@ void PointcloudInputHandler::processQueue() {
                      << pointcloud_queue_.size() - 1 << ".");
     integration_timer_.start();
     for (const auto& integrator : integrators_) {
+      ROS_INFO_STREAM("PC"); // Flags next integrated points call in updatemap() as pointcloud handler
       integrator->integratePointcloud(posed_pointcloud);
     }
     integration_timer_.stop();
+
+    double pointcloud_integration_time = integration_timer_.getLastEpisodeDuration();
+    double total_integration_time = integration_timer_.getTotalDuration();
+
+    // Insertion time testing
+    ROS_INFO_STREAM("Pointcloud image points: " << posed_pointcloud.size() << ", Pointcloud integration time: " << pointcloud_integration_time);
+    
     ROS_DEBUG_STREAM("Integrated new pointcloud in "
-                     << integration_timer_.getLastEpisodeDuration()
+                     << pointcloud_integration_time
                      << "s. Total integration time: "
-                     << integration_timer_.getTotalDuration() << "s.");
+                     << total_integration_time << "s.");
 
     // Publish debugging visualizations
     if (shouldPublishReprojectedPointcloud()) {
