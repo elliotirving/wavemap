@@ -118,7 +118,7 @@ void DepthImageInputHandler::processQueue() {
                      << depth_image_queue_.size() - 1 << ".");
     integration_timer_.start();
     for (const auto& integrator : scanwise_integrators_) {
-      ROS_INFO_STREAM("DEPTH"); // Flags next integrated points call in updatemap() as depth handler
+      // ROS_INFO_STREAM("DEPTH"); // Flags next integrated points call in updatemap() as depth handler
       integrator->integrateRangeImage(posed_range_image);
     }
     integration_timer_.stop();
@@ -128,7 +128,7 @@ void DepthImageInputHandler::processQueue() {
     double total_integration_time = integration_timer_.getTotalDuration(); 
 
     // Insertion time testing
-    ROS_INFO_STREAM("Depth image points: " << depth_image_points << ", Depth integration time: " << depth_integration_time);
+    // ROS_INFO_STREAM("Depth image points: " << depth_image_points << ", Depth integration time: " << depth_integration_time);
     
     ROS_DEBUG_STREAM("Integrated new depth image in "
                      << depth_integration_time

@@ -246,7 +246,7 @@ void PointcloudInputHandler::processQueue() {
                      << pointcloud_queue_.size() - 1 << ".");
     integration_timer_.start();
     for (const auto& integrator : integrators_) {
-      ROS_INFO_STREAM("PC"); // Flags next integrated points call in updatemap() as pointcloud handler
+      // ROS_INFO_STREAM("PC"); // Flags next integrated points call in updatemap() as pointcloud handler
       integrator->integratePointcloud(posed_pointcloud);
     }
     integration_timer_.stop();
@@ -255,7 +255,7 @@ void PointcloudInputHandler::processQueue() {
     double total_integration_time = integration_timer_.getTotalDuration();
 
     // Insertion time testing
-    ROS_INFO_STREAM("Pointcloud image points: " << posed_pointcloud.size() << ", Pointcloud integration time: " << pointcloud_integration_time);
+    // ROS_INFO_STREAM("Pointcloud image points: " << posed_pointcloud.size() << ", Pointcloud integration time: " << pointcloud_integration_time);
     
     ROS_DEBUG_STREAM("Integrated new pointcloud in "
                      << pointcloud_integration_time
