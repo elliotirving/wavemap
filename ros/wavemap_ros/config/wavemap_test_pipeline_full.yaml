@@ -1,5 +1,5 @@
-# Testing the full ROS2 FASTLIO -> bridge -> Wavemap pipeline, both mid360 and depth sensors
-
+# Live integration of Livox and 4x D435 
+# Testing the ROS2 FASTLIO -> bridge -> Wavemap pipeline
 
 
 map:
@@ -21,15 +21,16 @@ inputs:
   #     topic_name: "/livox/lidar_sensor_msgs" # ros1_bridge NOT bridging Livox CustomMsg
   #     topic_type: PointCloud2 # normally livox, see ^^^
   #     undistort_motion: false # Can't undistort for now, may implement in livox_to_pointcloud2
-  #     reprojected_pointcloud_topic_name: "/wavemap/lidar_input"
-  #     topic_queue_length: 10
-  #     max_wait_for_pose: { seconds: 5.0 }
+  #     # reprojected_pointcloud_topic_name: "/wavemap/lidar_input"
+  #     topic_queue_length: 10 # probably need to increase this a lot?
+  #     max_wait_for_pose: { seconds: 1.0 } # was 1, allowing more time
   #   integrators:
   #     - integration_method:
   #         type: hashed_chunked_wavelet_integrator
   #         min_range: { meters: 0.5 }
-  #         max_range: { meters: 12.0 }
+  #         max_range: { meters: 5.0 }
   #         termination_update_error: 0.1
+  #         termination_height: 0 # Defaults to 0 (max res)
   #       projection_model:
   #         type: spherical_projector
   #         elevation:
@@ -45,21 +46,19 @@ inputs:
   #         angle_sigma: { degrees: 0.05 }
   #         # NOTE: For best results, we recommend setting range_sigma to
   #         #       max(min_cell_width / 2, ouster_noise) where ouster_noise = 0.05
-  #         range_sigma: { meters: 0.08 }
+  #         range_sigma: { meters: 0.08 } # 0.08 default
   #         scaling_free: 0.2
   #         scaling_occupied: 0.4
 
-######################### TESTING POINTCLOUD (DEPTH) INTEGRATOR TYPE #########################
-# HAVENT TESTED THIS YET, SO FAR ONLY WORKING WITH DEPTH INTEGRATOR
-  - type: pointcloud
+  # Depth front 
+  - type: depth_image
     general:
-      topic_name: "/d435f_1/d435f_1/depth/color/points"
-      topic_type: PointCloud2
-      undistort_motion: true
-      topic_queue_length: 10
-      max_wait_for_pose: { seconds: 1.0 }
-      # reprojected_pointcloud_topic_name: "/wavemap/reprojected_pointcloud"
-      # projected_range_image_topic_name: "/wavemap/projected_range_image"
+      topic_name: "/d435_front/d435_front/depth/image_rect_raw"
+      topic_queue_length: 30
+      max_wait_for_pose: { seconds: 2.0 }
+      time_offset: { seconds: 0.0} # Unsure of value for D435f, imu to cam is +0.013387
+      depth_scale_factor: 0.001 # D435 depth scale is 1mm, don't change
+      # reprojected_pointcloud_topic_name: "/wavemap/depth_cam_front_input"
     integrators:
       - integration_method:
           type: hashed_chunked_wavelet_integrator
@@ -79,23 +78,94 @@ inputs:
           type: continuous_ray
           range_sigma: { meters: 0.005 }
           scaling_free: 0.4
-          scaling_occupied: 0.8
-      - integration_method:
-          type: hashed_chunked_wavelet_integrator
-          min_range: { meters: 1.0 }
-          max_range: { meters: 3.0 }
-          termination_update_error: 0.1
-          termination_height: 1
-        projection_model:
-          type: pinhole_camera_projector
-          width: 848
-          height: 480
-          fx: 427.29736328125
-          fy: 427.29736328125
-          cx: 432.1024475097656
-          cy: 236.54649353027344
-        measurement_model:
-          type: continuous_ray
-          range_sigma: { meters: 0.005 }
-          scaling_free: 0.4
-          scaling_occupied: 0.8
+  #         scaling_occupied: 0.8
+
+  # # Depth right
+  # - type: depth_image
+  #   general:
+  #     topic_name: "/d435_right/d435_right/depth/image_rect_raw"
+  #     topic_queue_length: 30
+  #     max_wait_for_pose: { seconds: 2.0 }
+  #     time_offset: { seconds: 0.0} # Unsure of value for D435f, imu to cam is +0.013387, -0.01 kinda worked
+  #     depth_scale_factor: 0.001 # D435 depth scale is 1mm, don't change
+  #     # reprojected_pointcloud_topic_name: "/wavemap/depth_cam_front_input"
+  #   integrators:
+  #     - integration_method:
+  #         type: hashed_chunked_wavelet_integrator
+  #         min_range: { meters: 0.2 }
+  #         max_range: { meters: 1.0 }
+  #         termination_update_error: 0.1
+  #         termination_height: 0
+  #       projection_model:
+  #         type: pinhole_camera_projector
+  #         width: 848
+  #         height: 480
+  #         fx: 427.29736328125
+  #         fy: 427.29736328125
+  #         cx: 432.1024475097656
+  #         cy: 236.54649353027344
+  #       measurement_model:
+  #         type: continuous_ray
+  #         range_sigma: { meters: 0.005 }
+  #         scaling_free: 0.4
+  #         scaling_occupied: 0.8
+
+  # # Depth back
+  # - type: depth_image
+  #   general:
+  #     topic_name: "/d435_back/d435_back/depth/image_rect_raw"
+  #     topic_queue_length: 30
+  #     max_wait_for_pose: { seconds: 2.0 }
+  #     time_offset: { seconds: 0.0} # Unsure of value for D435f, imu to cam is +0.013387, -0.01 kinda worked
+  #     depth_scale_factor: 0.001 # D435 depth scale is 1mm, don't change
+  #     # reprojected_pointcloud_topic_name: "/wavemap/depth_cam_front_input"
+  #   integrators:
+  #     - integration_method:
+  #         type: hashed_chunked_wavelet_integrator
+  #         min_range: { meters: 0.2 }
+  #         max_range: { meters: 1.0 }
+  #         termination_update_error: 0.1
+  #         termination_height: 0
+  #       projection_model:
+  #         type: pinhole_camera_projector
+  #         width: 848
+  #         height: 480
+  #         fx: 427.29736328125
+  #         fy: 427.29736328125
+  #         cx: 432.1024475097656
+  #         cy: 236.54649353027344
+  #       measurement_model:
+  #         type: continuous_ray
+  #         range_sigma: { meters: 0.005 }
+  #         scaling_free: 0.4
+  #         scaling_occupied: 0.8
+
+  # # Depth left
+  # - type: depth_image
+  #   general:
+  #     topic_name: "/d435_left/d435_left/depth/image_rect_raw"
+  #     topic_queue_length: 30
+  #     max_wait_for_pose: { seconds: 2.0 }
+  #     time_offset: { seconds: 0.0} # Unsure of value for D435f, imu to cam is +0.013387, -0.01 kinda worked
+  #     depth_scale_factor: 0.001 # D435 depth scale is 1mm, don't change
+  #     # reprojected_pointcloud_topic_name: "/wavemap/depth_cam_front_input"
+  #   integrators:
+  #     - integration_method:
+  #         type: hashed_chunked_wavelet_integrator
+  #         min_range: { meters: 0.2 }
+  #         max_range: { meters: 1.0 }
+  #         termination_update_error: 0.1
+  #         termination_height: 0
+  #       projection_model:
+  #         type: pinhole_camera_projector
+  #         width: 848
+  #         height: 480
+  #         fx: 427.29736328125
+  #         fy: 427.29736328125
+  #         cx: 432.1024475097656
+  #         cy: 236.54649353027344
+  #       measurement_model:
+  #         type: continuous_ray
+  #         range_sigma: { meters: 0.005 }
+  #         scaling_free: 0.4
+  #         scaling_occupied: 0.8

@@ -46,7 +46,7 @@ void HashedChunkedWaveletIntegrator::updateMap() {
   }
   thread_pool_->wait_all();
 
-  ROS_INFO_STREAM("Points integrated: " << num_points_integrated); // integration time testing
+  // ROS_INFO_STREAM("Points integrated: " << num_points_integrated); // integration time testing
 }
 
 std::pair<OctreeIndex, OctreeIndex>
@@ -145,9 +145,6 @@ void HashedChunkedWaveletIntegrator::updateNodeRecursive(  // NOLINT
       const FloatingPoint sample = computeUpdate(C_child_center);
       child_value += sample;
       block_needs_thresholding = true;
-
-      num_points_integrated++; // integration time testing
-
       continue;
     }
 
@@ -181,7 +178,7 @@ void HashedChunkedWaveletIntegrator::updateNodeRecursive(  // NOLINT
 
     // If we're at the leaf level, directly compute the update
     if (child_height == config_.termination_height + 1) {
-      updateLeavesBatch(child_index, child_value, child_details);
+      updateLeavesBatch(child_index, child_value, child_details); // integration time testing, index inside this function for voxel updates!
     } else {
       // Otherwise, recurse
       DCHECK_GE(child_height, 0);
